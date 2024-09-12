@@ -1,0 +1,50 @@
+#--------------------Setup-------------------------------------#
+#processors        5 4 3
+units	           metal
+atom_style         atomic
+boundary           p p p
+
+#neighbor	  0.3 bin
+neigh_modify	  delay 0
+atom_modify	  map yes sort 0 0.0
+read_data         structure.lmp #Initial_str_config.lmp # E_field_min.lmp #  Initial_config.lmp
+read_dump         dump.neb.${image} ${image}  x y z
+
+variable CU_PER_ATOM_VOL equal 11.73 # in A^3
+variable N equal 185160 # total num of atoms
+#------------------------ FORCE FIELDS ------------------------------
+pair_style    eam/alloy
+pair_coeff    * * Cu01.eam.alloy.txt Cu
+#--------------------------  DEFINE REGIONS AND GROUPS --------------
+region         material_reg block EDGE EDGE EDGE EDGE 403 482 units box
+group          material region material_reg
+group             nebatoms type 1
+timestep	  0.001
+
+compute           PE all pe/atom
+compute           csym all centro/atom fcc
+variable          u uloop 20000
+#fix             freeze bottom setforce NULL NULL 0.0                   
+fix		1 nebatoms neb 10 perp 10 # end last 2
+
+# ------------------------- SETTINGS ---------------------------------
+compute        peratom material stress/atom NULL
+compute        stress_vol material reduce sum c_peratom[1] c_peratom[2] c_peratom[3] c_peratom[4] c_peratom[5] c_peratom[6]
+#compute        N material count/type atom
+#variable       material_vol equal $N*${CU_PER_ATOM_VOL}
+variable       s_xx equal c_stress_vol[1]/v_material_vol/10000 # in GPa
+variable       s_yy equal c_stress_vol[2]/v_material_vol/10000 # in GPa
+variable       s_zz equal c_stress_vol[3]/v_material_vol/10000 # in GPa
+variable       s_xy equal c_stress_vol[4]/v_material_vol/10000 # in GPa
+variable       s_xz equal c_stress_vol[5]/v_material_vol/10000 # in GPa
+variable       s_yz equal c_stress_vol[6]/v_material_vol/10000 # in GPa
+
+thermo		100
+thermo_style    custom step temp vol pe press pxx pyy pxy v_s_xx v_s_yy v_s_zz v_s_xy
+thermo_modify   flush yes
+
+
+run 0
+
+
+
