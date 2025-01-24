@@ -2,3 +2,6 @@ Analysis for this work was perfomred using standard softwares such as open sourc
 
 1. Constant stress ensemble prediction can be found at compression_2%, tension_2%. 
 2. Associated notebooks and all relelvant data presented in the main text can be found in Main_Figure_Data (directory labels might not directly reflect the figure numbers)
+
+Paper: Bagchi, S., Perez, D. Anomalous entropy-driven kinetics of dislocation nucleation. Nat Commun 16, 912 (2025). https://doi.org/10.1038/s41467-025-56272-4
+https://www.nature.com/articles/s41467-025-56272-4
